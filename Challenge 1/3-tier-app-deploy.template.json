@@ -41,262 +41,343 @@
         "bizNSGResourceId": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('bizNSGName'))]",
         "webVMNicPIPResourceId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('webVMNicPIPName'))]",
         "webSubnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('webSubnetName'))]",
-        "bizSubnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('bizSubnetName'))]"
+        "bizSubnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('bizSubnetName'))]",
+        "webVMName": "demo-web-vm",
+        "webVMNicResourceId": "[resourceId('Microsoft.Network/networkInterfaces', variables('webVMNicName'))]"
 
     },
     "resources": [
-        {
-            "type": "Microsoft.Sql/servers",
-            "kind": "v12.0",
-            "name": "[parameters('sqlServerName')]",
-            "apiVersion": "2015-05-01-preview",
-            "location": "[resourceGroup().location]",
-            "tags": {
-                "tier": "data"
-            },
-            "scale": null,
-            "properties": {
-                "administratorLogin": "[parameters('username')]",
-                "administratorLoginPassword": "[parameters('password')]",
-                "version": "12.0"
-            },
-            "resources": [
-                {
-                    "type": "databases",
-                    "sku": {
-                        "name": "S0",
-                        "tier": "Standard"
-                    },
-                    "kind": "v12.0,user",
-                    "name": "[variables('sqlServerDatabaseName')]",
-                    "apiVersion": "2017-03-01-preview",
-                    "location": "[resourceGroup().location]",
-                    "tags": {
-                        "tier": "data"
-                    },
-                    "scale": null,
-                    "properties": {
-                        "collation": "SQL_Latin1_General_CP1_CI_AS"
-                    },
-                    "dependsOn": [
-                        "[variables('sqlServerResourceId')]"
-                    ]
-                }
-            ],
-            "dependsOn": []
-        },
-        {
-            "type": "Microsoft.Sql/servers/virtualNetworkRules",
-            "name": "[concat(parameters('sqlServerName'), '/demo-vnet-biz-rule')]",
-            "apiVersion": "2015-05-01-preview",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "ignoreMissingVnetServiceEndpoint": false,
-                "virtualNetworkSubnetId": "[variables('bizSubnetResourceId')]"
-            },
-            "dependsOn": [
-                "[variables('vnetResourceId')]",
-                "[variables('sqlServerResourceId')]"
-            ]
-        },
-        {
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "name": "[variables('webNSGName')]",
-            "apiVersion": "2018-08-01",
-            "location": "[resourceGroup().location]",
-            "tags": {
-                "tier": "presentation"
-            },
-            "properties": {
-                "securityRules": [
+            {
+                "type": "Microsoft.Sql/servers",
+                "kind": "v12.0",
+                "name": "[parameters('sqlServerName')]",
+                "apiVersion": "2015-05-01-preview",
+                "location": "[resourceGroup().location]",
+                "tags": {
+                    "tier": "data"
+                },
+                "scale": null,
+                "properties": {
+                    "administratorLogin": "[parameters('username')]",
+                    "administratorLoginPassword": "[parameters('password')]",
+                    "version": "12.0"
+                },
+                "resources": [
                     {
-                        "name": "http",
+                        "type": "databases",
+                        "sku": {
+                            "name": "S0",
+                            "tier": "Standard"
+                        },
+                        "kind": "v12.0,user",
+                        "name": "[variables('sqlServerDatabaseName')]",
+                        "apiVersion": "2017-03-01-preview",
+                        "location": "[resourceGroup().location]",
+                        "tags": {
+                            "tier": "data"
+                        },
+                        "scale": null,
                         "properties": {
-                            "protocol": "Tcp",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "80",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 300,
-                            "direction": "Inbound"
-                        }
+                            "collation": "SQL_Latin1_General_CP1_CI_AS"
+                        },
+                        "dependsOn": [
+                            "[variables('sqlServerResourceId')]"
+                        ]
                     }
+                ],
+                "dependsOn": []
+            },
+            {
+                "type": "Microsoft.Sql/servers/virtualNetworkRules",
+                "name": "[concat(parameters('sqlServerName'), '/demo-vnet-biz-rule')]",
+                "apiVersion": "2015-05-01-preview",
+                "location": "[resourceGroup().location]",
+                "properties": {
+                    "ignoreMissingVnetServiceEndpoint": false,
+                    "virtualNetworkSubnetId": "[variables('bizSubnetResourceId')]"
+                },
+                "dependsOn": [
+                    "[variables('vnetResourceId')]",
+                    "[variables('sqlServerResourceId')]"
                 ]
             },
-            "dependsOn": []
-        },
-        {
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "name": "[variables('bizNSGName')]",
-            "apiVersion": "2018-08-01",
-            "location": "[resourceGroup().location]",
-            "tags": {
-                "tier": "application"
-            },
-            "properties": {
-                "securityRules": [
-                    {
-                        "name": "http",
-                        "properties": {
-                            "protocol": "Tcp",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "80",
-                            "sourceAddressPrefix": "10.1.0.0/24",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 300,
-                            "direction": "Inbound"
+            {
+                "type": "Microsoft.Network/networkSecurityGroups",
+                "name": "[variables('webNSGName')]",
+                "apiVersion": "2018-08-01",
+                "location": "[resourceGroup().location]",
+                "tags": {
+                    "tier": "presentation"
+                },
+                "properties": {
+                    "securityRules": [
+                        {
+                            "name": "http",
+                            "properties": {
+                                "protocol": "Tcp",
+                                "sourcePortRange": "*",
+                                "destinationPortRange": "80",
+                                "sourceAddressPrefix": "*",
+                                "destinationAddressPrefix": "*",
+                                "access": "Allow",
+                                "priority": 300,
+                                "direction": "Inbound"
+                            }
                         }
-                    },
-                    {
-                        "name": "DenyInbound",
-                        "properties": {
-                            "protocol": "*",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "*",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Deny",
-                            "priority": 400,
-                            "direction": "Inbound"
-                        }
-                    }
-                ]
-            },
-            "dependsOn": []
-        },
-        {
-            "type": "Microsoft.Network/virtualNetworks",
-            "name": "[variables('vnetName')]",
-            "apiVersion": "2018-08-01",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "[variables('vnetAddressPrefix')]"
                     ]
                 },
-                "subnets": [
-                    {
-                        "name": "[variables('webSubnetName')]",
-                        "properties": {
-                            "addressPrefix": "[variables('webSubnetPrefix')]"
+                "dependsOn": []
+            },
+            {
+                "type": "Microsoft.Network/networkSecurityGroups",
+                "name": "[variables('bizNSGName')]",
+                "apiVersion": "2018-08-01",
+                "location": "[resourceGroup().location]",
+                "tags": {
+                    "tier": "application"
+                },
+                "properties": {
+                    "securityRules": [
+                        {
+                            "name": "http",
+                            "properties": {
+                                "protocol": "Tcp",
+                                "sourcePortRange": "*",
+                                "destinationPortRange": "80",
+                                "sourceAddressPrefix": "10.1.0.0/24",
+                                "destinationAddressPrefix": "*",
+                                "access": "Allow",
+                                "priority": 300,
+                                "direction": "Inbound"
+                            }
+                        },
+                        {
+                            "name": "DenyInbound",
+                            "properties": {
+                                "protocol": "*",
+                                "sourcePortRange": "*",
+                                "destinationPortRange": "*",
+                                "sourceAddressPrefix": "*",
+                                "destinationAddressPrefix": "*",
+                                "access": "Deny",
+                                "priority": 400,
+                                "direction": "Inbound"
+                            }
                         }
+                    ]
+                },
+                "dependsOn": []
+            },
+            {
+                "type": "Microsoft.Network/virtualNetworks",
+                "name": "[variables('vnetName')]",
+                "apiVersion": "2018-08-01",
+                "location": "[resourceGroup().location]",
+                "properties": {
+                    "addressSpace": {
+                        "addressPrefixes": [
+                            "[variables('vnetAddressPrefix')]"
+                        ]
                     },
-                    {
-                        "name": "[variables('bizSubnetName')]",
-                        "properties": {
-                            "addressPrefix": "[variables('bizSubnetPrefix')]",
-                            "serviceEndpoints": [
-                                {
-                                    "service": "Microsoft.Sql",
-                                    "locations": [
-                                        "[resourceGroup().location]"
-                                    ]
-                                }
-                            ]
+                    "subnets": [
+                        {
+                            "name": "[variables('webSubnetName')]",
+                            "properties": {
+                                "addressPrefix": "[variables('webSubnetPrefix')]"
+                            }
+                        },
+                        {
+                            "name": "[variables('bizSubnetName')]",
+                            "properties": {
+                                "addressPrefix": "[variables('bizSubnetPrefix')]",
+                                "serviceEndpoints": [
+                                    {
+                                        "service": "Microsoft.Sql",
+                                        "locations": [
+                                            "[resourceGroup().location]"
+                                        ]
+                                    }
+                                ]
+                            }
                         }
+                    ]
+                },
+                "dependsOn": []
+            },
+            {
+                "type": "Microsoft.Network/publicIPAddresses",
+                "sku": {
+                    "name": "Basic",
+                    "tier": "Regional"
+                },
+                "name": "[variables('webVMNicPIPName')]",
+                "apiVersion": "2018-08-01",
+                "location": "[resourceGroup().location]",
+                "tags": {
+                    "tier": "presentation"
+                },
+                "properties": {
+                    "publicIPAddressVersion": "IPv4",
+                    "publicIPAllocationMethod": "Static",
+                    "idleTimeoutInMinutes": 4
+                },
+                "dependsOn": []
+            },
+            {
+                "type": "Microsoft.Network/networkInterfaces",
+                "name": "[variables('webVMNicName')]",
+                "apiVersion": "2018-08-01",
+                "location": "[resourceGroup().location]",
+                "tags": {
+                    "tier": "presentation"
+                },
+                "scale": null,
+                "properties": {
+                    "ipConfigurations": [
+                        {
+                            "name": "ipconfig1",
+                            "properties": {
+                                "privateIPAddress": "10.1.0.4",
+                                "privateIPAllocationMethod": "Static",
+                                "publicIPAddress": {
+                                    "id": "[variables('webVMNicPIPResourceId')]"
+                                },
+                                "subnet": {
+                                    "id": "[variables('webSubnetResourceId')]"
+                                },
+                                "primary": true,
+                                "privateIPAddressVersion": "IPv4"
+                            }
+                        }
+                    ],
+                    "enableAcceleratedNetworking": false,
+                    "enableIPForwarding": false,
+                    "primary": true,
+                    "networkSecurityGroup": {
+                        "id": "[variables('webNSGResourceId')]"
                     }
+                },
+                "dependsOn": [
+                    "[variables('webVMNicPIPName')]",
+                    "[variables('vnetResourceId')]",
+                    "[variables('webNSGResourceId')]"
                 ]
             },
-            "dependsOn": []
-        },
-        {
-            "type": "Microsoft.Network/publicIPAddresses",
-            "sku": {
-                "name": "Basic",
-                "tier": "Regional"
+            {
+                "type": "Microsoft.Network/networkInterfaces",
+                "name": "[variables('bizVMNicName')]",
+                "apiVersion": "2018-08-01",
+                "location": "[resourceGroup().location]",
+                "tags": {
+                    "tier": "application"
+                },
+                "scale": null,
+                "properties": {
+                    "ipConfigurations": [
+                        {
+                            "name": "ipconfig1",
+                            "properties": {
+                                "privateIPAddress": "10.1.1.4",
+                                "privateIPAllocationMethod": "Static",
+                                "subnet": {
+                                    "id": "[variables('bizSubnetResourceId')]"
+                                },
+                                "primary": true,
+                                "privateIPAddressVersion": "IPv4"
+                            }
+                        }
+                    ],
+                    "enableAcceleratedNetworking": false,
+                    "enableIPForwarding": false,
+                    "primary": true,
+                    "networkSecurityGroup": {
+                        "id": "[variables('bizNSGResourceId')]"
+                    }
+                },
+                "dependsOn": [
+                    "[variables('vnetResourceId')]",
+                    "[variables('bizNSGResourceId')]"
+                ]
             },
-            "name": "[variables('webVMNicPIPName')]",
-            "apiVersion": "2018-08-01",
-            "location": "[resourceGroup().location]",
-            "tags": {
-                "tier": "presentation"
-            },
-            "properties": {
-                "publicIPAddressVersion": "IPv4",
-                "publicIPAllocationMethod": "Static",
-                "idleTimeoutInMinutes": 4
-            },
-            "dependsOn": []
-        },
-        {
-            "type": "Microsoft.Network/networkInterfaces",
-            "name": "[variables('webVMNicName')]",
-            "apiVersion": "2018-08-01",
-            "location": "[resourceGroup().location]",
-            "tags": {
-                "tier": "presentation"
-            },
-            "scale": null,
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "privateIPAddress": "10.1.0.4",
-                            "privateIPAllocationMethod": "Static",
-                            "publicIPAddress": {
-                                "id": "[variables('webVMNicPIPResourceId')]"
+            {
+                "type": "Microsoft.Compute/virtualMachines",
+                "name": "[variables('webVMName')]",
+                "apiVersion": "2018-06-01",
+                "location": "[resourceGroup().location]",
+                "tags": {
+                    "tier": "presentation"
+                },
+                "properties": {
+                    "hardwareProfile": {
+                        "vmSize": "Standard_D2s_v3"
+                    },
+                    "storageProfile": {
+                        "imageReference": {
+                            "publisher": "Canonical",
+                            "offer": "UbuntuServer",
+                            "sku": "18.04-LTS",
+                            "version": "latest"
+                        },
+                        "osDisk": {
+                            "osType": "Linux",
+                            "name": "[concat(variables('webVMName'), '-disk')]",
+                            "createOption": "FromImage",
+                            "caching": "ReadWrite",
+                            "managedDisk": {
+                                "storageAccountType": "Premium_LRS"
                             },
-                            "subnet": {
-                                "id": "[variables('webSubnetResourceId')]"
-                            },
-                            "primary": true,
-                            "privateIPAddressVersion": "IPv4"
+                            "diskSizeGB": 30
+                        },
+                        "dataDisks": []
+                    },
+                    "osProfile": {
+                        "computerName": "[variables('webVMName')]",
+                        "adminUsername": "[parameters('username')]",
+                        "adminPassword": "[parameters('password')]",
+                        "linuxConfiguration": {
+                            "disablePasswordAuthentication": false,
+                            "provisionVMAgent": true
+                        },
+                        "secrets": [],
+                        "allowExtensionOperations": true
+                    },
+                    "networkProfile": {
+                        "networkInterfaces": [
+                            {
+                                "id": "[variables('webVMNicResourceId')]"
+                            }
+                        ]
+                    },
+                    "diagnosticsProfile": {
+                        "bootDiagnostics": {
+                            "enabled": false
                         }
                     }
-                ],
-                "enableAcceleratedNetworking": false,
-                "enableIPForwarding": false,
-                "primary": true,
-                "networkSecurityGroup": {
-                    "id": "[variables('webNSGResourceId')]"
-                }
-            },
-            "dependsOn": [
-                "[variables('webVMNicPIPName')]",
-                "[variables('vnetResourceId')]",
-                "[variables('webNSGResourceId')]"
-            ]
-        },
-        {
-            "type": "Microsoft.Network/networkInterfaces",
-            "name": "[variables('bizVMNicName')]",
-            "apiVersion": "2018-08-01",
-            "location": "[resourceGroup().location]",
-            "tags": {
-                "tier": "application"
-            },
-            "scale": null,
-            "properties": {
-                "ipConfigurations": [
+                },
+                "resources": [
                     {
-                        "name": "ipconfig1",
+                        "type": "extensions",
+                        "name": "apache-ext",
+                        "apiVersion": "2018-10-01",
+                        "location": "[resourceGroup().location]",
                         "properties": {
-                            "privateIPAddress": "10.1.1.4",
-                            "privateIPAllocationMethod": "Static",
-                            "subnet": {
-                                "id": "[variables('bizSubnetResourceId')]"
-                            },
-                            "primary": true,
-                            "privateIPAddressVersion": "IPv4"
-                        }
+                            "publisher": "Microsoft.Azure.Extensions",
+                            "type": "CustomScript",
+                            "typeHandlerVersion": "2.0",
+                            "autoUpgradeMinorVersion": true,
+                            "settings": {
+                                "skipDos2Unix": true
+                            }
+                        },
+                        "dependsOn": [
+                            "[variables('webVMName')]"
+                        ]
                     }
                 ],
-                "enableAcceleratedNetworking": false,
-                "enableIPForwarding": false,
-                "primary": true,
-                "networkSecurityGroup": {
-                    "id": "[variables('bizNSGResourceId')]"
-                }
-            },
-            "dependsOn": [
-                "[variables('vnetResourceId')]",
-                "[variables('bizNSGResourceId')]"
-            ]
-        }
+                "dependsOn": [
+                    "[variables('webVMNicName')]"
+                ]
+            }
         ],
     "outputs": {}
 }
