@@ -1,9 +1,20 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {},
-    "functions": [],
-    "variables": {},
-    "resources": [],
-    "outputs": {}
+    "parameters": {
+        "sqlServerName": {
+            "value": "demo-kpmg-sql"
+        },
+        "username": {
+            "value": "adminaccount"
+        },
+        "password": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/996ec04d-f171-4281-a17b-ca0209711e2b/resourceGroups/adevopspro-share-rg/providers/Microsoft.KeyVault/vaults/groupwebvault"
+                },
+                "secretName": "GlobalSecret"
+            }
+        }
+    }
 }

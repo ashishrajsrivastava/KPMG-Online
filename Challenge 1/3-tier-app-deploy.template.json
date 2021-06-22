@@ -1,9 +1,72 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {},
+    "parameters": {
+        "sqlServerName": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "username": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "password": {
+            "type": "securestring",
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
     "functions": [],
-    "variables": {},
-    "resources": [],
+    "variables": {
+        "sqlServerDatabaseName": "demo-sqldb",
+        "sqlServerResourceId": "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]"
+    },
+    "resources": [        
+            {
+                "type": "Microsoft.Sql/servers",
+                "kind": "v12.0",
+                "name": "[parameters('sqlServerName')]",
+                "apiVersion": "2015-05-01-preview",
+                "location": "[resourceGroup().location]",
+                "tags": {
+                    "tier": "data"
+                },
+                "scale": null,
+                "properties": {
+                    "administratorLogin": "[parameters('username')]",
+                    "administratorLoginPassword": "[parameters('password')]",
+                    "version": "12.0"
+                },
+                "resources": [
+                    {
+                        "type": "databases",
+                        "sku": {
+                            "name": "S0",
+                            "tier": "Standard"
+                        },
+                        "kind": "v12.0,user",
+                        "name": "[variables('sqlServerDatabaseName')]",
+                        "apiVersion": "2017-03-01-preview",
+                        "location": "[resourceGroup().location]",
+                        "tags":{
+                            "tier":"data"
+                        },
+                        "scale": null,
+                        "properties": {
+                            "collation": "SQL_Latin1_General_CP1_CI_AS"
+                        },
+                        "dependsOn": [
+                            "[variables('sqlServerResourceId')]"
+                        ]
+                    }
+                ],
+                "dependsOn": []
+            }
+        ],
     "outputs": {}
 }
