@@ -5,19 +5,19 @@
         "sqlServerName": {
             "type": "string",
             "metadata": {
-                "description": "description"
+                "description": "Name of SQL Server"
             }
         },
         "username": {
             "type": "string",
             "metadata": {
-                "description": "description"
+                "description": "Enter username"
             }
         },
         "password": {
             "type": "securestring",
             "metadata": {
-                "description": "description"
+                "description": "Enter Password"
             }
         }
     },
