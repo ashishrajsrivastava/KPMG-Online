@@ -371,9 +371,9 @@
                             "skipDos2Unix": true
                         },
                         "protectedSettings": {
-                            "commandToExecute": "sh script.sh",
+                            "commandToExecute": "sh webappscript.sh",
                             "fileUris": [
-                                "[uri(variables('deploymentUrl'), 'webappscript.sh')]"
+                                "https://raw.githubusercontent.com/ashishrajsrivastava/KPMG-Online/main/Challenge%201/webappscript.sh"
                             ]
                         }
                     },
@@ -458,7 +458,7 @@
                             "protectedSettings": {
                             "commandToExecute": "sh webappscript.sh",
                             "fileUris": [
-                                "[uri(variables('deploymentUrl'), 'webappscript.sh')]"
+                                "https://raw.githubusercontent.com/ashishrajsrivastava/KPMG-Online/main/Challenge%201/webappscript.sh"
                             ]
                         }
                     },
