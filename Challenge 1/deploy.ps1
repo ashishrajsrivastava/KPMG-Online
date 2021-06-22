@@ -1,6 +1,19 @@
+$RGName = "KPMGTest-RG"
+
 Login-AzAccount
 
-New-AzResourceGroup -Name "KPMGTest-RG" -location 'eastus'
+$RG = Get-AzResourceGroup -Name $RGName -ErrorAction SilentlyContinue
 
-New-AzResourceGroupDeployment -ResourceGroupName "KPMGTest-RG" -TemplateFile '.\Challenge 1\3-tier-app-deploy.template.json' `
-                              -TemplateParameterFile '.\Challenge 1\3-tier-app-deploy.parameter.json' -Verbose
+if(!$RG)
+{
+    Write-Host "Resource Group $RGName does not exist, Creating it..."
+    New-AzResourceGroup -Name $RGName -location 'eastus'
+    Write-Host "Resource Group $RGName Created."
+
+}
+else {
+    Write-Host "$RGName exist, continuing deployment"
+}
+Write-Host "Starting Deployment..."
+New-AzResourceGroupDeployment -ResourceGroupName "KPMGTest-RG" -TemplateFile '.\3-tier-app-deploy.template.json' `
+                              -TemplateParameterFile '.\3-tier-app-deploy.parameter.json' -Verbose
